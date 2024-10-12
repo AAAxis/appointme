@@ -1,11 +1,11 @@
 
 import 'package:driver_app/authentication/email_login.dart';
 import 'package:driver_app/mainScreens/Account.dart';
+import 'package:driver_app/mainScreens/orders.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:driver_app/invoice.dart';
-import 'package:driver_app/mainScreens/second_screen.dart';
+import 'package:driver_app/mainScreens/invoice.dart';
 
 class Navigation extends StatefulWidget {
   @override
@@ -38,7 +38,7 @@ class _NavigationState extends State<Navigation> {
         children: [
           InvoiceGenerator(),
           AccountPage(),
-          ScheduleScreen(),
+          OrdersPage(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -61,7 +61,7 @@ class _NavigationState extends State<Navigation> {
 
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Schedule',
+            label: 'Appointments',
           ),
         ],
       ),

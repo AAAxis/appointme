@@ -3,11 +3,12 @@ import 'package:driver_app/authentication/email_login.dart';
 import 'package:driver_app/mainScreens/bank.dart';
 import 'package:driver_app/mainScreens/notifications.dart';
 import 'package:driver_app/mainScreens/qr_code.dart';
-import 'package:driver_app/slots.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'working_hours.dart';
 
 class AccountPage extends StatefulWidget {
   @override
@@ -109,7 +110,7 @@ class _AccountPageState extends State<AccountPage> {
             onTap: () async {
               final User? user = FirebaseAuth.instance.currentUser; // Get current user
               if (user != null) {
-                final String url = 'https://hamaspera.vercel.app/barbershop/${user.uid}'; // Dynamic UID insertion
+                final String url = 'https://appointia.vercel.app/barbershop/${user.uid}'; // Dynamic UID insertion
                 final Uri uri = Uri.parse(url);
                 await launch(uri.toString());
               } else {

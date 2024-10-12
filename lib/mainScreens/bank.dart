@@ -1,7 +1,7 @@
 import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EditBankScreen extends StatelessWidget {
   @override
@@ -44,13 +44,13 @@ class _BankInfoFormState extends State<BankInfoForm> {
 
   void _loadBankInfo() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? uid = prefs.getString('uid');
+      User? user = FirebaseAuth.instance.currentUser;
 
-      if (uid != null) {
+      if (user != null) {
+        String uid = user.uid; // Get UID from the authenticated user
         DocumentSnapshot snapshot = await FirebaseFirestore.instance
-            .collection('bank') // Target the 'bank' collection
-            .doc(uid) // Use UID as the document ID
+            .collection('bank')
+            .doc(uid)
             .get();
 
         if (snapshot.exists) {
@@ -76,7 +76,7 @@ class _BankInfoFormState extends State<BankInfoForm> {
         children: [
           TextFormField(
             controller: _bankNameController,
-            readOnly: dataExists, // Set to true if data exists
+            readOnly: dataExists,
             decoration: InputDecoration(
               labelText: 'Bank Name',
               prefixIcon: Icon(Icons.account_balance),
@@ -86,7 +86,7 @@ class _BankInfoFormState extends State<BankInfoForm> {
           TextFormField(
             controller: _transitNumberController,
             keyboardType: TextInputType.number,
-            readOnly: dataExists, // Set to true if data exists
+            readOnly: dataExists,
             decoration: InputDecoration(
               labelText: 'Transit Number',
               prefixIcon: Icon(Icons.format_list_numbered),
@@ -95,7 +95,7 @@ class _BankInfoFormState extends State<BankInfoForm> {
           SizedBox(height: 20),
           TextFormField(
             controller: _branchController,
-            readOnly: dataExists, // Set to true if data exists
+            readOnly: dataExists,
             decoration: InputDecoration(
               labelText: 'Branch',
               prefixIcon: Icon(Icons.location_on),
@@ -124,19 +124,18 @@ class _BankInfoFormState extends State<BankInfoForm> {
 
   void _saveBankInfo() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? uid = prefs.getString('uid');
+      User? user = FirebaseAuth.instance.currentUser;
 
-      if (uid == null) {
-        print('User UID not found in shared preferences.');
+      if (user == null) {
+        print('User not authenticated.');
         return;
       }
 
+      String uid = user.uid;
       String bankName = _bankNameController.text;
       String transitNumber = _transitNumberController.text;
       String branch = _branchController.text;
 
-      // Save to the bank collection using UID as the document ID
       await FirebaseFirestore.instance
           .collection('bank')
           .doc(uid)
@@ -149,7 +148,7 @@ class _BankInfoFormState extends State<BankInfoForm> {
       print('Bank information saved to Firestore');
 
       setState(() {
-        dataExists = true; // Update to reflect that data now exists
+        dataExists = true;
       });
     } catch (e) {
       print('Error saving bank information: $e');
@@ -158,23 +157,22 @@ class _BankInfoFormState extends State<BankInfoForm> {
 
   void _deleteBankInfo() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? uid = prefs.getString('uid');
+      User? user = FirebaseAuth.instance.currentUser;
 
-      if (uid != null) {
+      if (user != null) {
+        String uid = user.uid;
         await FirebaseFirestore.instance
             .collection('bank')
-            .doc(uid) // Delete the specific document using UID
+            .doc(uid)
             .delete();
 
         print('Bank information deleted from Firestore');
 
-        // Clear text fields
         setState(() {
           _bankNameController.clear();
           _transitNumberController.clear();
           _branchController.clear();
-          dataExists = false; // Update to reflect data no longer exists
+          dataExists = false;
         });
       }
     } catch (e) {

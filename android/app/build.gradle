@@ -28,9 +28,9 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('/Users/admin/Documents/GitHub/wheels-flutter/driver_app/my-release-key.keystore')
+            storeFile file('/Users/admin/Documents/GitHub/appointme/my-release-key.keystore')
             storePassword '123456'
-            keyAlias 'my_key-alias'
+            keyAlias 'my-key-alias'
             keyPassword '123456'
         }
     }

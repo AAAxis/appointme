@@ -4,7 +4,43 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be10626d-892b-4ccc-951e-e12bc8164cba" name="Changes" comment="" />
+    <list default="true" id="be10626d-892b-4ccc-951e-e12bc8164cba" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/.filecache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/app.dill" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/debug_android_application.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/debug_android_application.stamp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/flutter_assets.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/flutter_assets.d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.stamp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/outputs.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/outputs.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/program.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/program.dill" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/Preview.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/Preview.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/apple.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/bank.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/google.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/hola.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/new.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/people2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/profile.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/splash.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/t.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/invoice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/invoice.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainScreens/account.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/account.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainScreens/bank.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/bank.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainScreens/navigation.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/navigation.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainScreens/notifications.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/notifications.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainScreens/second_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/orders.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/slots.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/working_hours.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/splashScreen/splash_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/splashScreen/splash_screen.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -45,27 +81,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/admin/Documents/GitHub/appointme&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Flutter.main.dart.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "ScreenshotViewer.SavePath": "/Users/admin/Documents/GitHub/appointme",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "io.flutter.reload.alreadyRun": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/admin/Documents/GitHub/appointme/android/app/src/main/res",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/android/app/src/main/res" />
       <recent name="$PROJECT_DIR$/android/app/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/images" />
+      <recent name="$PROJECT_DIR$/lib/mainScreens" />
       <recent name="$PROJECT_DIR$/android/app" />
       <recent name="$PROJECT_DIR$/android/app/src" />
     </key>

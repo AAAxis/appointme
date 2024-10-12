@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:driver_app/mainScreens/navigation.dart';
-
+import 'package:url_launcher/url_launcher.dart'; // Add this to handle the link
 
 class MySplashScreen extends StatefulWidget {
   const MySplashScreen({Key? key}) : super(key: key);
@@ -16,8 +16,6 @@ class MySplashScreen extends StatefulWidget {
 
 class _MySplashScreenState extends State<MySplashScreen> {
 
-
-
   Future<void> _requestPermissionManually() async {
     final trackingStatus = await AppTrackingTransparency.requestTrackingAuthorization();
     print('Manual tracking permission request status: $trackingStatus');
@@ -25,10 +23,8 @@ class _MySplashScreenState extends State<MySplashScreen> {
     final prefs = await SharedPreferences.getInstance();
 
     if (trackingStatus == TrackingStatus.authorized) {
-      // User granted permission
       await prefs.setBool('trackingPermissionStatus', true);
     } else {
-      // User denied permission or not determined, store it as false
       await prefs.setBool('trackingPermissionStatus', false);
     }
   }
@@ -41,18 +37,15 @@ class _MySplashScreenState extends State<MySplashScreen> {
 
   void _checkCurrentUser() {
     Timer(Duration(seconds: 3), () async {
-      // Check if the user is authenticated
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        // User is authenticated, navigate to the main screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Navigation()),
         );
       } else {
         _requestPermissionManually();
-        // User is not authenticated, navigate to the login screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => EmailLoginScreen()),
@@ -61,12 +54,17 @@ class _MySplashScreenState extends State<MySplashScreen> {
     });
   }
 
+  Future<void> _launchURL() async {
+    const _url = 'https://buymeacoffee.com/theholylabs';
+
+      await launch(_url);
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onVerticalDragEnd: (_) {
-        // Handle vertical swipe to continue
         _requestPermissionManually();
       },
       child: Material(
@@ -77,7 +75,6 @@ class _MySplashScreenState extends State<MySplashScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(100.0),
                   child: SizedBox(
                     width: 250,
                     height: 250,
@@ -85,11 +82,15 @@ class _MySplashScreenState extends State<MySplashScreen> {
                   ),
                 ),
                 const SizedBox(height: 30,),
-                Text(
-                  "Swipe to Continue >>",
-                  style: TextStyle(
-                    color: Colors.black, // Change the color to your preference
-                    fontSize: 16,
+                GestureDetector(
+                  onTap: _launchURL,
+                  child: Text(
+                    "Buy me a 'coffee", // Custom display text
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ],
