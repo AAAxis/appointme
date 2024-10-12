@@ -5,41 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="be10626d-892b-4ccc-951e-e12bc8164cba" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/.filecache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/app.dill" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/debug_android_application.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/debug_android_application.stamp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/flutter_assets.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/flutter_assets.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.d" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/kernel_snapshot_program.stamp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/outputs.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/outputs.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/program.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/665969e9e3cc374d1e3d1d090e996986/program.dill" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/Preview.png" beforeDir="false" afterPath="$PROJECT_DIR$/images/Preview.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/apple.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/bank.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/google.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/hola.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/new.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/people2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/profile.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/splash.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/t.mp4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/invoice.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/invoice.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/mainScreens/account.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/account.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/mainScreens/bank.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/bank.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/mainScreens/navigation.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/navigation.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/mainScreens/notifications.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/notifications.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/mainScreens/second_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/orders.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/slots.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/working_hours.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/splashScreen/splash_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/splashScreen/splash_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
