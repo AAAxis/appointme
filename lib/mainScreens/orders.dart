@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart'; // For date formatting
 
 class OrdersPage extends StatefulWidget {
   @override
@@ -10,7 +11,8 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
   List<DocumentSnapshot> orders = [];
   final String uid = FirebaseAuth.instance.currentUser!.uid;
-  String? selectedDateTime;
+  DateTime selectedDate = DateTime.now();
+  String? selectedHour;
   TextEditingController employeeController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController serviceController = TextEditingController();
@@ -22,174 +24,265 @@ class _OrdersPageState extends State<OrdersPage> {
   }
 
   Future<void> fetchOrders() async {
-    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+    QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
         .collection('orders')
-        .where('store', isEqualTo: uid)
+        .where('store', isEqualTo: uid) // Filter by store (UID)
         .get();
 
     setState(() {
-      orders = snapshot.docs;
+      orders = snapshot.docs; // Get all orders for the UID
     });
   }
 
-  Future<void> deleteOrder(String orderId) async {
-    await FirebaseFirestore.instance.collection('orders').doc(orderId).delete();
-    fetchOrders(); // Refresh the list after deletion
+  DateTime? selectedDateTime; // Nullable because it may not be selected yet
+
+  String get formattedDateT {
+    if (selectedDateTime == null) return ''; // Return an empty string if no date is selected
+    return DateFormat('yyyy-MM-dd').format(selectedDateTime!); // Format the selected date
   }
 
-  Future<void> updateOrderStatus(String orderId, bool isConfirmed) async {
-    await FirebaseFirestore.instance.collection('orders').doc(orderId).update({
-      'status': isConfirmed ? 'confirmed' : 'pending', // Update status based on checkbox
-    });
-    fetchOrders(); // Refresh the list after update
+  // Get the first day of the current month
+  DateTime getFirstDayOfMonth() {
+    return DateTime(selectedDate.year, selectedDate.month, 1);
+  }
+
+  // Get the number of days in the current month
+  int getDaysInMonth() {
+    return DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
+  }
+
+  // Build the calendar view
+  Widget buildCalendar() {
+    int daysInMonth = getDaysInMonth();
+    DateTime firstDayOfMonth = getFirstDayOfMonth();
+
+    List<Widget> dayWidgets = [];
+    // Add empty widgets for the days before the first day of the month
+    for (int i = 0; i < firstDayOfMonth.weekday - 1; i++) {
+      dayWidgets.add(SizedBox());
+    }
+
+    // Add widgets for each day in the month
+    for (int day = 1; day <= daysInMonth; day++) {
+      dayWidgets.add(
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedDate =
+                  DateTime(selectedDate.year, selectedDate.month, day);
+            });
+            showHourSelectionDialog(context);
+          },
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              color: selectedDate.day == day ? Colors.blue : null,
+            ),
+            child: Text('$day'),
+          ),
+        ),
+      );
+    }
+
+    return GridView.count(
+      crossAxisCount: 7,
+      children: dayWidgets,
+      shrinkWrap: true, // Allows GridView to fit inside a column
+    );
+  }
+
+  // Add this function to handle the new dialog with name, phone, and service inputs.
+  void showHourSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Select Appointment Details'),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Hour selection dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(labelText: 'Select Hour'),
+                      value: selectedHour,
+                      items: List.generate(13, (index) {
+                        // Generate hours from 8 AM to 8 PM
+                        int hour = 8 + index;
+                        String time = '${hour.toString().padLeft(2, '0')}:00';
+                        return DropdownMenuItem<String>(
+                          value: time,
+                          child: Text(time),
+                        );
+                      }),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedHour = value;
+                        });
+                      },
+                    ),
+                    // Name input field
+                    TextField(
+                      controller: employeeController,
+                      decoration: InputDecoration(labelText: 'Name'),
+                    ),
+                    // Phone input field
+                    TextField(
+                      controller: phoneController,
+                      decoration: InputDecoration(labelText: 'Phone'),
+                    ),
+                    // Service selection dropdown
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(labelText: 'Select Service'),
+                      value: serviceController.text.isEmpty
+                          ? null
+                          : serviceController.text,
+                      items: ['barber', 'nails', 'paint'].map((String service) {
+                        return DropdownMenuItem<String>(
+                          value: service,
+                          child: Text(service),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          serviceController.text = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedHour != null &&
+                        employeeController.text.isNotEmpty &&
+                        phoneController.text.isNotEmpty &&
+                        serviceController.text.isNotEmpty) {
+                      addAppointment(); // Submit the appointment if all fields are filled
+                      Navigator.of(context).pop(); // Close dialog
+                    } else {
+                      // Show an error if any field is empty
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Please fill all fields')),
+                      );
+                    }
+                  },
+                  child: Text('Submit'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> addAppointment() async {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
     await FirebaseFirestore.instance.collection('orders').add({
-      'datetime': selectedDateTime,
+      'datetime': '$formattedDate $selectedHour',
       'employee': employeeController.text,
       'phone': phoneController.text,
       'service': serviceController.text,
-      'status': 'confirmed', // Automatically setting the status to confirmed
+      'status': 'confirmed',
       'store': uid,
     });
-    fetchOrders(); // Refresh the list after adding
+    fetchOrders(); // Refresh the list after adding the appointment
+    clearFields(); // Clear the input fields after submission
+  }
+
+  void clearFields() {
+    employeeController.clear();
+    phoneController.clear();
+    serviceController.clear();
+    selectedHour = null; // Reset hour selection
+  }
+
+  // New method to build the appointments list with swipe-to-delete functionality
+  Widget buildAppointmentsList() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: orders.length,
+        itemBuilder: (context, index) {
+          final order = orders[index];
+          return Dismissible(
+            key: Key(order.id), // Unique key for each item
+            background: Container(color: Colors.red, alignment: Alignment.centerRight, padding: EdgeInsets.symmetric(horizontal: 20), child: Icon(Icons.delete, color: Colors.white)),
+            onDismissed: (direction) async {
+              // Remove the item from Firestore
+              await FirebaseFirestore.instance.collection('orders').doc(order.id).delete();
+              // Remove the item from the local list
+              setState(() {
+                orders.removeAt(index);
+              });
+              // Show a snackbar message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Appointment deleted')),
+              );
+            },
+            child: ListTile(
+              title: Text(order['employee'] ?? 'Unknown Employee'),
+              subtitle: Text(
+                  'Service: ${order['service'] ?? 'N/A'}, Phone: ${order['phone'] ?? 'N/A'}, Date: ${order['datetime'] ?? 'N/A'}'),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.more_time_outlined), // Replace this with your custom icon
-          onPressed: () {
-            // Logic for the custom icon button
-            // For example, you can open a drawer or navigate to another page
-          },
-        ),
         title: Text('Appointments'),
-
-      ),
-
-      body: Padding(
-        padding: const EdgeInsets.only(top: 16.0), // Top margin
-        child: orders.isEmpty
-            ? Center(child: Text('No appointments found.'))
-            : ListView.builder(
-          itemCount: orders.length,
-          itemBuilder: (context, index) {
-            final order = orders[index];
-            bool isConfirmed = order['status'] == 'confirmed'; // Check if status is confirmed
-            String appointmentDate = order['datetime']; // Extract date
-
-            return Dismissible(
-              key: Key(order.id),
-              direction: DismissDirection.endToStart,
-              onDismissed: (direction) {
-                deleteOrder(order.id);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Appointment deleted')),
-                );
-              },
-              background: Container(
-                color: Colors.red,
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                child: Icon(Icons.delete, color: Colors.white),
-              ),
-              child: ListTile(
-                leading: Checkbox(
-                  value: isConfirmed,
-                  onChanged: (bool? value) {
-                    // Handle checkbox state change
-                    setState(() {
-                      updateOrderStatus(order.id, value ?? false); // Update Firestore status
-                    });
-                  },
-                ),
-                title: Text(order['employee'] ?? 'No Employee'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(order['service'] ?? 'No Service'),
-
-                  ],
-                ),
-                trailing:     Text(appointmentDate), // Display appointment date
-              ),
-            );
-          },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle adding an appointment
-          showAddAppointmentDialog(context);
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-
-  void showAddAppointmentDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Add Appointment'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Select DateTime'),
-                value: selectedDateTime,
-                items: <String>[
-                  '2024-09-28T00:40',
-                  '2024-10-01T14:30',
-                  '2024-10-03T09:00',
-                ].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedDateTime = value!;
-                  });
-                },
-              ),
-              TextField(
-                controller: employeeController,
-                decoration: InputDecoration(labelText: 'Employee'),
-              ),
-              TextField(
-                controller: phoneController,
-                decoration: InputDecoration(labelText: 'Phone'),
-              ),
-              TextField(
-                controller: serviceController,
-                decoration: InputDecoration(labelText: 'Service'),
-              ),
-            ],
+        actions: [
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              setState(() {
+                selectedDate =
+                    DateTime(selectedDate.year, selectedDate.month - 1);
+              });
+            },
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                addAppointment(); // Add the appointment to Firebase
-                Navigator.of(context).pop(); // Close the dialog after adding
-              },
-              child: Text('Add'),
+          IconButton(
+            icon: Icon(Icons.arrow_forward),
+            onPressed: () {
+              setState(() {
+                selectedDate =
+                    DateTime(selectedDate.year, selectedDate.month + 1);
+              });
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Text(
+            DateFormat('MMMM yyyy').format(selectedDate),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          buildCalendar(),
+          SizedBox(height: 20),
+          if (selectedHour != null) ...[
+            Text('Selected DateTime: ${DateFormat('yyyy-MM-dd').format(selectedDate)} $selectedHour'),
+            ElevatedButton(
+              onPressed: () => showHourSelectionDialog(context), // Open dialog
+              child: Text('Add Appointment'),
             ),
           ],
-        );
-      },
+          buildAppointmentsList(), // Display the list of appointments
+        ],
+      ),
     );
   }
 }

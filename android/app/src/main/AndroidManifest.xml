@@ -27,7 +27,7 @@
     <application
         android:enableOnBackInvokedCallback="true"
         android:usesCleartextTraffic="true"
-        android:label="AppointMe"
+        android:label="Appoint Master"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
