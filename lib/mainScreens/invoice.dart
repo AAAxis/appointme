@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:driver_app/mainScreens/bank.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -41,9 +42,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return _uid != null
         ? StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
-          .collection('businesses')
-          .doc(_uid)
           .collection('invoices')
+          .where('user', isEqualTo: FirebaseAuth.instance.currentUser?.uid) // Use the correct field name for UID
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -96,13 +96,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
               background: Container(color: Colors.red),
               direction: DismissDirection.endToStart,
               onDismissed: (direction) async {
-                // Remove the document from Firestore
+                // Remove the document from Firestore using the docId
                 await FirebaseFirestore.instance
-                    .collection('businesses')
-                    .doc(_uid)
                     .collection('invoices')
-                    .doc(docId)
+                    .doc(docId) // Use the document ID directly
                     .delete();
+
                 // Show a snackbar or any other feedback
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -121,6 +120,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     : null,
               ),
             );
+
           },
         );
       },
@@ -221,15 +221,15 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
         'selectedDate': DateTime.now().toIso8601String().split('T')[0],
         'user': uid,
         'status': 'open',
-        'items': items,
       };
 
-      final DocumentReference docRef = await FirebaseFirestore.instance.collection('businesses').doc(uid).collection('invoices').add(invoiceData);
+      // Save to the invoices collection
+      final DocumentReference docRef = await FirebaseFirestore.instance.collection('invoices').add(invoiceData);
       final String docId = docRef.id;
       await _sendInvoice(docId, invoiceData);
 
       customerNameController.clear();
-      items.clear();
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Invoice sent successfully')),
@@ -273,10 +273,8 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
   Future<void> _showAddDetailsDialog() async {
     String name = '';
 
-
     return showDialog<void>(
       context: context,
-     // User must tap button to close
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Add Client'),
@@ -289,23 +287,31 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
                 },
                 decoration: InputDecoration(labelText: 'Name'),
               ),
-
             ],
           ),
           actions: <Widget>[
             ElevatedButton(
               onPressed: () {
-                // Add your onPressed logic here
-                setState(() { customerNameController.text = name; });
-                Navigator.of(context).pop();
-                _tabController.animateTo(1);
+                // Validate that name is not empty
+                if (name.isNotEmpty) {
+                  setState(() {
+                    customerNameController.text = name;
+                  });
+                  Navigator.of(context).pop();
+                  _tabController.animateTo(1);
+                } else {
+                  // Show an error message if name is empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please enter a client name')),
+                  );
+                }
               },
               child: Text('Save'),
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: Colors.black, // Text color
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.black, // Text color
               ),
-            )
-
+            ),
           ],
         );
       },
@@ -317,9 +323,10 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
     return businessNameController.text.isNotEmpty &&
         businessLocationController.text.isNotEmpty &&
         businessPhoneController.text.isNotEmpty &&
-
+        customerNameController.text.isNotEmpty && // Ensure customer name is provided
         totalValue >= 5;
   }
+
 
 
   @override
@@ -327,10 +334,12 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.attach_money), // Replace this with your custom icon
+          icon: Icon(Icons.payment_outlined), // Hamburger menu icon
           onPressed: () {
-            // Logic for the custom icon button
-            // For example, you can open a drawer or navigate to another page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => EditBankScreen()),
+            ); // Open the drawer
           },
         ),
         title: Text('New Payment'),
@@ -455,17 +464,20 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
                             ),
                           ),
                         );
-                      } else {
+                      } // Change the OK button logic
+                      else {
                         return Center(
                           child: Padding(
                             padding: EdgeInsets.all(2.0),
                             child: ElevatedButton(
-                              onPressed: _validateFields() ? () async {
+                              onPressed: () async {
+                                // First show the dialog to get the client name
                                 await _showAddDetailsDialog();
+                                // Then validate fields and save data if valid
                                 if (_validateFields()) {
                                   _saveData();
                                 }
-                              } : null,
+                              },
                               style: ElevatedButton.styleFrom(
                                 minimumSize: Size(70, 70),
                                 backgroundColor: Colors.black,
@@ -475,11 +487,11 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
                                 'OK',
                                 style: TextStyle(color: Colors.white),
                               ),
-                            )
-
+                            ),
                           ),
                         );
                       }
+
                     },
                   ),
                 ),

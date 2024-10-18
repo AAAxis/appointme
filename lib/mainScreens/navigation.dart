@@ -1,7 +1,6 @@
 
 import 'package:driver_app/authentication/email_login.dart';
-import 'package:driver_app/mainScreens/Account.dart';
-import 'package:driver_app/mainScreens/orders.dart';
+import 'package:driver_app/mainScreens/appointments.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +36,6 @@ class _NavigationState extends State<Navigation> {
         index: _currentIndex,
         children: [
           InvoiceGenerator(),
-          AccountPage(),
           OrdersPage(),
         ],
       ),
@@ -54,10 +52,6 @@ class _NavigationState extends State<Navigation> {
             label: 'Payment',
           ),
 
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account', // Initial label while waiting for future
-          ),
 
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),

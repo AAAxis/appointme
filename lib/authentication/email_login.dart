@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
 import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:url_launcher/url_launcher.dart'; // Import for URL launcher
-
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class EmailLoginScreen extends StatefulWidget {
@@ -12,6 +11,13 @@ class EmailLoginScreen extends StatefulWidget {
   @override
   _EmailLoginScreenState createState() => _EmailLoginScreenState();
 }
+
+void _launchURL() async {
+  const url = 'https://appointmaster.vercel.app'; // Replace with your desired URL
+    await launch(url);
+
+}
+
 
 class _EmailLoginScreenState extends State<EmailLoginScreen> {
   final TextEditingController emailController = TextEditingController();
@@ -62,11 +68,10 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
   // Launch the registration URL
   void _launchRegistrationUrl() async {
-    const url = 'https://hamaspera.vercel.app/register/'; // Replace with your registration URL
-
-      await launch(url);
-
+    const url = 'https://appointmaster.vercel.app/register/'; // Replace with your registration URL
+    await launch(url);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,17 +115,44 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                 obscureText: true,
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: signInWithEmail,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Background color
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+              Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min, // Makes the row take the minimum width it needs
+                  children: [
+                    ElevatedButton(
+                      onPressed: signInWithEmail,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue, // Background color
+                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Text(
+                        "Sign In",
+                        style: TextStyle(color: Colors.white), // Text color set to white
+                      ),
+                    ),
+
+                    SizedBox(width: 20), // Space between the two buttons
+                    OutlinedButton(
+                      onPressed: _launchURL,
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        side: BorderSide(color: Colors.green, width: 2), // Outline color and width
+                      ),
+                      child: Text(
+                        "Skip",
+                        style: TextStyle(color: Colors.green), // Text color to match the outline
+                      ),
+                    ),
+                  ],
                 ),
-                child: Text("Sign In"),
               ),
+
               SizedBox(height: 20),
               if (errorMessage.isNotEmpty)
                 Text(

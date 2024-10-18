@@ -82,15 +82,11 @@ class _MySplashScreenState extends State<MySplashScreen> {
                   ),
                 ),
                 const SizedBox(height: 30,),
-                GestureDetector(
-                  onTap: _launchURL,
-                  child: Text(
-                    "Buy me a 'coffee", // Custom display text
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16,
-                      decoration: TextDecoration.underline,
-                    ),
+                Text(
+                  "Swipe to Continue >>",
+                  style: TextStyle(
+                    color: Colors.black, // Change the color to your preference
+                    fontSize: 16,
                   ),
                 ),
               ],

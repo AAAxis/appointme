@@ -165,7 +165,22 @@ class _SchedulePageState extends State<SchedulePage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: schedules.isEmpty
-            ? Center(child: CircularProgressIndicator())
+            ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'No schedules found.',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Please add a schedule.',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        )
             : ListView.builder(
           itemCount: schedules.length,
           itemBuilder: (context, index) {
@@ -230,4 +245,5 @@ class _SchedulePageState extends State<SchedulePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Position the button on the right
     );
   }
+
 }
