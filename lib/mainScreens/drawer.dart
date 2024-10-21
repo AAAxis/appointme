@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:driver_app/authentication/email_login.dart';
+import 'package:driver_app/authentication/hello.dart';
 import 'package:driver_app/mainScreens/bank.dart';
 import 'package:driver_app/mainScreens/employess.dart';
+import 'package:driver_app/mainScreens/inpurchase.dart';
 import 'package:driver_app/mainScreens/notifications.dart';
 import 'package:driver_app/mainScreens/profile.dart';
 import 'package:driver_app/mainScreens/service.dart';
@@ -27,7 +28,7 @@ class CustomDrawer extends StatelessWidget {
     await prefs.clear();
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => EmailLoginScreen()),
+      MaterialPageRoute(builder: (context) => LoginScreen()),
     );
   }
 
@@ -79,10 +80,7 @@ class CustomDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (user?.photoURL != null)
-                      CircleAvatar(
-                        backgroundImage: NetworkImage(user!.photoURL!),
-                        radius: 40.0,
-                      ),
+
                     SizedBox(height: 10.0),
                     Text(
                       businessInfo.businessName, // Access the business name from the BusinessInfo object
@@ -145,7 +143,7 @@ class CustomDrawer extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.work, color: Colors.black),
+                leading: const Icon(Icons.people_alt_outlined, color: Colors.black),
                 title: const Text(
                   "Employees",
                   style: TextStyle(color: Colors.black),
@@ -158,31 +156,34 @@ class CustomDrawer extends StatelessWidget {
                   );
                 },
               ),
+
+        ListTile(
+        leading: const Icon(Icons.play_circle_outline, color: Colors.black),
+        title: const Text(
+        "Subscription",
+        style: TextStyle(color: Colors.black),
+        ),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (c) => InAppPurchasePage()),
+            );
+          },
+        ),
+
+
               ListTile(
-                leading: const Icon(Icons.sensors_rounded, color: Colors.black),
+                leading: const Icon(Icons.credit_card, color: Colors.black),
                 title: const Text(
-                  "Services",
+                  "Payout Method",
                   style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (c) => ServiceDetailsScreen()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.notification_add_outlined, color: Colors.black),
-                title: const Text(
-                  "Notifications",
-                  style: TextStyle(color: Colors.black),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (c) => NotificationScreen()),
+                    MaterialPageRoute(builder: (c) => EditBankScreen()),
                   );
                 },
               ),

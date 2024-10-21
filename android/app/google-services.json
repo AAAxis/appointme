@@ -7,6 +7,58 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1018170430611:android:8afdc8900fa0e8cb2ea966",
+        "android_client_info": {
+          "package_name": "com.theholylabs.ampm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1018170430611-f7g4dv5v75qjmtcv6qcsbo2d1b112roq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.theholylabs.ampm",
+            "certificate_hash": "0c90adcefec7b1ed4d5c6d32c6ffccc3aa303c0e"
+          }
+        },
+        {
+          "client_id": "1018170430611-tpdj2peutau1sjh99d7uhtnvpci0f119.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.theholylabs.ampm",
+            "certificate_hash": "6aac46e9a05490fa73bb1e35200b5b6e68ce462b"
+          }
+        },
+        {
+          "client_id": "1018170430611-h66uoobnkr74m25rgc02agtunj2la7r3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCr_V126CZoqHdqtqAUsZsBTJdVIaqguvA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1018170430611-h66uoobnkr74m25rgc02agtunj2la7r3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1018170430611-h5ev3j5p22gv0etc3ko5d9mp7v2ejvmr.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.theholylabs.appointme"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1018170430611:android:8f8837304d4bfdd52ea966",
         "android_client_info": {
           "package_name": "com.theholylabs.appointme"
@@ -47,10 +99,10 @@
               "client_type": 3
             },
             {
-              "client_id": "1018170430611-ikc5qjakq9km1pvnqite7clmjaujbbb7.apps.googleusercontent.com",
+              "client_id": "1018170430611-h5ev3j5p22gv0etc3ko5d9mp7v2ejvmr.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.wheels.driverapp"
+                "bundle_id": "com.theholylabs.appointme"
               }
             }
           ]

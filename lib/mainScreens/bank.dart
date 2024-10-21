@@ -181,4 +181,3 @@ class _BankInfoFormState extends State<BankInfoForm> {
     }
   }
 }
-

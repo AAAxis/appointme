@@ -1,10 +1,7 @@
-import 'dart:io';
 import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class EmployeeDetailsScreen extends StatefulWidget {
   @override
@@ -18,8 +15,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   List<Map<String, dynamic>> employees = []; // List to store fetched employees
   List<Map<String, dynamic>> services = []; // List to store fetched services
   String message = ''; // Message to display when no employees are found
-  final ImagePicker _picker = ImagePicker(); // Image picker for selecting images
-  XFile? selectedImage; // Variable to store the selected image
+  final String hardcodedImageUrl = 'https://polskoydm.pythonanywhere.com/static/images.jpeg'; // Hardcoded image URL
 
   @override
   void initState() {
@@ -30,7 +26,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   void fetchEmployeeDetails() {
     final currentUserId = _auth.currentUser!.uid;
 
-    // Use Firestore's snapshot method to listen for real-time updates
     _firestore
         .collection('employees')
         .where('userId', isEqualTo: currentUserId)
@@ -48,7 +43,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       } else {
         setState(() {
           employees = [];
-          message = 'No employees found for this user.';
+          message = 'No employees found';
         });
       }
     }, onError: (error) {
@@ -92,115 +87,128 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          // Use StatefulBuilder to manage the state within the dialog
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: Text("Add Employee"),
-              content: SingleChildScrollView(
+        return AlertDialog(
+          title: Text("Add Employee"),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image selection
-                    selectedImage == null
-                        ? TextButton(
-                      onPressed: () async {
-                        selectedImage = await _picker.pickImage(source: ImageSource.gallery);
-                        setState(() {}); // Update the state inside the dialog
-                      },
-                      child: Text("Select Image"),
-                    )
-                        : Column(
-                      children: [
-                        Image.file(
-                          File(selectedImage!.path),
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            selectedImage = await _picker.pickImage(source: ImageSource.gallery);
-                            setState(() {}); // Update the state inside the dialog
-                          },
-                          child: Text("Change Image"),
-                        ),
-                      ],
+                    // Hardcoded image display
+                    Image.network(
+                      hardcodedImageUrl,
+                      height: 100,
+                      fit: BoxFit.cover,
                     ),
                     TextField(
                       controller: nameController,
-                      decoration: InputDecoration(labelText: 'Employee Name'),
+                      decoration: InputDecoration(labelText: 'Name'),
                     ),
                     TextField(
                       controller: phoneController,
                       decoration: InputDecoration(labelText: 'Phone'),
                       keyboardType: TextInputType.phone,
                     ),
-                    // Display services with checkboxes
+                    // Display services with bubbles
                     services.isEmpty
                         ? Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text('Fetching services...', style: TextStyle(fontStyle: FontStyle.italic)),
+                      child: Text(
+                        'Fetching services...',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
                     )
-                        : Column(
+                        : Wrap( // Use Wrap for a more compact arrangement of the bubbles
+                      spacing: 8.0, // Horizontal space between bubbles
+                      runSpacing: 8.0, // Vertical space between bubbles
                       children: services.map((service) {
-                        return CheckboxListTile(
-                          title: Text(service['name']), // Display service name
-                          value: selectedServiceIds.contains(service['id']), // Checkbox value
-                          onChanged: (bool? selected) {
+                        final isSelected = selectedServiceIds.contains(service['id']);
+                        return GestureDetector(
+                          onTap: () {
                             setState(() {
-                              if (selected == true) {
-                                selectedServiceIds.add(service['id']); // Add service ID
+                              if (isSelected) {
+                                selectedServiceIds.remove(service['id']); // Unselect the service
                               } else {
-                                selectedServiceIds.remove(service['id']); // Remove service ID
+                                selectedServiceIds.add(service['id']); // Select the service
                               }
                             });
                           },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 4), // Reduced margin
+                            padding: const EdgeInsets.all(8), // Reduced padding
+                            decoration: BoxDecoration(
+                              color: isSelected ? Colors.green : Colors.grey, // Background color based on selection
+                              borderRadius: BorderRadius.circular(15), // Adjusted corner radius for smaller bubbles
+                              border: Border.all(color: isSelected ? Colors.black : Colors.red),
+                            ),
+                            child: Text(
+                              service['name'],
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black, // Text color based on selection
+                                fontSize: 12, // Reduced text size to fit smaller bubbles
+                              ),
+                            ),
+                          ),
                         );
                       }).toList(),
                     ),
+
                   ],
                 ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    if (selectedImage != null &&
-                        nameController.text.isNotEmpty &&
-                        phoneController.text.isNotEmpty &&
-                        selectedServiceIds.isNotEmpty) { // Ensure at least one service is selected
-                      String uploadImageUrl = await uploadImage(selectedImage!);
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (nameController.text.isNotEmpty &&
+                    phoneController.text.isNotEmpty &&
+                    selectedServiceIds.isNotEmpty) { // Ensure at least one service is selected
+                  // Create the employee data with the hardcoded image URL
+                  Map<String, dynamic> employeeData = {
+                    'image': hardcodedImageUrl,
+                    'name': nameController.text,
+                    'phone': phoneController.text,
+                    'userId': _auth.currentUser!.uid,
+                    'services': selectedServiceIds, // Store as a list of service IDs
+                  };
 
-                      if (uploadImageUrl.isNotEmpty) {
-                        // Create the employee data with attached services
-                        Map<String, dynamic> employeeData = {
-                          'image': uploadImageUrl,
-                          'name': nameController.text,
-                          'phone': phoneController.text,
-                          'userId': _auth.currentUser!.uid,
-                          'services': selectedServiceIds, // Store as a list of service IDs
-                        };
+                  await _firestore.collection('employees').add(employeeData);
 
-                        await _firestore.collection('employees').add(employeeData);
-                        Navigator.of(context).pop();
-                        fetchEmployeeDetails(); // Refresh the employee details
-                      } else {
-                        setState(() {
-                          message = 'Failed to upload image. Please try again.';
-                        });
-                      }
-                    }
-                  },
-                  child: Text("Add"),
-                ),
-              ],
-            );
-          },
+                  // Close the dialog after successfully adding the employee
+                  Navigator.of(context).pop();
+                  fetchEmployeeDetails(); // Refresh the employee details
+                } else {
+                  // Optional: Show an alert if any field is empty
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Error"),
+                        content: Text("Please fill in all fields and select at least one service."),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close error dialog
+                            },
+                            child: Text("OK"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Text("Add"),
+            ),
+          ],
         );
       },
     );
@@ -215,27 +223,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     }
   }
 
-  Future<String> uploadImage(XFile image) async {
-    try {
-      final storageRef = FirebaseStorage.instance.ref();
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final imageRef = storageRef.child('employees/$fileName');
-
-      await imageRef.putFile(File(image.path));
-
-      String downloadUrl = await imageRef.getDownloadURL();
-      return downloadUrl;
-    } catch (error) {
-      print('Error uploading image: $error');
-      return '';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employee Details'),
+        title: Text('Employees'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -249,7 +241,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: message.isNotEmpty
-            ? Center(child: Text(message, style: TextStyle(fontSize: 18, color: Colors.red)))
+            ? Center(child: Text(message, style: TextStyle(fontSize: 18, color: Colors.black)))
             : employees.isEmpty
             ? Center(child: CircularProgressIndicator())
             : ListView.builder(
@@ -277,7 +269,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                   },
                 ),
               ),
-
             );
           },
         ),

@@ -1,6 +1,7 @@
 
 import 'package:driver_app/authentication/email_login.dart';
 import 'package:driver_app/mainScreens/appointments.dart';
+import 'package:driver_app/mainScreens/notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,7 +37,8 @@ class _NavigationState extends State<Navigation> {
         index: _currentIndex,
         children: [
           InvoiceGenerator(),
-          OrdersPage(),
+          AppointmentsPage(),
+          NotificationScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -49,13 +51,18 @@ class _NavigationState extends State<Navigation> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.add_card_rounded),
-            label: 'Payment',
+            label: 'Checkout',
           ),
 
 
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
             label: 'Appointments',
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_none_rounded),
+            label: 'Notifications',
           ),
         ],
       ),

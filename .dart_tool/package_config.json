@@ -446,8 +446,38 @@
       "languageVersion": "2.19"
     },
     {
+      "name": "in_app_purchase",
+      "rootUri": "file:///Users/admin/.pub-cache/hosted/pub.dev/in_app_purchase-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
+      "name": "in_app_purchase_android",
+      "rootUri": "file:///Users/admin/.pub-cache/hosted/pub.dev/in_app_purchase_android-0.3.6+10",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "in_app_purchase_platform_interface",
+      "rootUri": "file:///Users/admin/.pub-cache/hosted/pub.dev/in_app_purchase_platform_interface-1.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
+      "name": "in_app_purchase_storekit",
+      "rootUri": "file:///Users/admin/.pub-cache/hosted/pub.dev/in_app_purchase_storekit-0.3.18+2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "intl",
       "rootUri": "file:///Users/admin/.pub-cache/hosted/pub.dev/intl-0.19.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "json_annotation",
+      "rootUri": "file:///Users/admin/.pub-cache/hosted/pub.dev/json_annotation-4.9.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -824,7 +854,7 @@
       "languageVersion": "2.18"
     }
   ],
-  "generated": "2024-10-18T11:24:44.525382Z",
+  "generated": "2024-10-18T16:54:41.475863Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///Users/admin/Documents/flutter",

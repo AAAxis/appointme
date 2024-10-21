@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:intl/intl.dart';
 import 'package:driver_app/mainScreens/drawer.dart';
 
-class OrdersPage extends StatefulWidget {
+class AppointmentsPage extends StatefulWidget {
   @override
-  _OrdersPageState createState() => _OrdersPageState();
+  _AppointmentsPageState createState() => _AppointmentsPageState();
 }
 
-class _OrdersPageState extends State<OrdersPage> {
+class _AppointmentsPageState extends State<AppointmentsPage> {
   List<DocumentSnapshot> orders = [];
   final String uid = FirebaseAuth.instance.currentUser!.uid;
   DateTime selectedDate = DateTime.now();
@@ -22,6 +22,7 @@ class _OrdersPageState extends State<OrdersPage> {
   void initState() {
     super.initState();
     fetchOrders();
+    _checkEmailVerification(); // Check email verification status
   }
 
   Future<void> fetchOrders() async {
@@ -34,6 +35,41 @@ class _OrdersPageState extends State<OrdersPage> {
     setState(() {
       orders = snapshot.docs; // Get all orders for the UID
     });
+  }
+
+  Future<void> _checkEmailVerification() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null && !user.emailVerified) {
+      // Show Snackbar if email is not verified after a slight delay
+      Future.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Email is not verified.'),
+            duration: Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Send Email',
+              onPressed: () {
+                user.sendEmailVerification().then((_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Verification email sent!'),
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                }).catchError((error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error sending email: $error'),
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                });
+              },
+            ),
+          ),
+        );
+      });
+    }
   }
 
   DateTime? selectedDateTime; // Nullable because it may not be selected yet
@@ -89,10 +125,40 @@ class _OrdersPageState extends State<OrdersPage> {
       );
     }
 
-    return GridView.count(
-      crossAxisCount: 7,
-      children: dayWidgets,
-      shrinkWrap: true, // Allows GridView to fit inside a column
+    return Column(
+      children: [
+        // Month navigation
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(Icons.chevron_left),
+              onPressed: () {
+                setState(() {
+                  selectedDate = DateTime(selectedDate.year, selectedDate.month - 1);
+                });
+              },
+            ),
+            Text(
+              DateFormat('MMMM yyyy').format(selectedDate), // Display month name
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: Icon(Icons.chevron_right),
+              onPressed: () {
+                setState(() {
+                  selectedDate = DateTime(selectedDate.year, selectedDate.month + 1);
+                });
+              },
+            ),
+          ],
+        ),
+        GridView.count(
+          crossAxisCount: 7,
+          children: dayWidgets,
+          shrinkWrap: true, // Allows GridView to fit inside a column
+        ),
+      ],
     );
   }
 
@@ -128,6 +194,16 @@ class _OrdersPageState extends State<OrdersPage> {
                       },
                     ),
                     // Name input field
+                    TextField(
+                      controller: employeeController,
+                      decoration: InputDecoration(labelText: 'Name'),
+                    ),
+                    // Phone input field
+                    TextField(
+                      controller: phoneController,
+                      decoration: InputDecoration(labelText: 'Phone'),
+                    ),
+                    // Service selection dropdown
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: 'Select Service'),
                       value: serviceController.text.isEmpty
@@ -145,17 +221,6 @@ class _OrdersPageState extends State<OrdersPage> {
                         });
                       },
                     ),
-                    TextField(
-                      controller: employeeController,
-                      decoration: InputDecoration(labelText: 'Name'),
-                    ),
-                    // Phone input field
-                    TextField(
-                      controller: phoneController,
-                      decoration: InputDecoration(labelText: 'Phone'),
-                    ),
-                    // Service selection dropdown
-
                   ],
                 ),
               ),
@@ -201,6 +266,14 @@ class _OrdersPageState extends State<OrdersPage> {
     });
     fetchOrders(); // Refresh the list after adding the appointment
     clearFields(); // Clear the input fields after submission
+
+    // Show a Snackbar notification for successful appointment creation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Appointment successfully created!'),
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   void clearFields() {
@@ -222,47 +295,35 @@ class _OrdersPageState extends State<OrdersPage> {
           IconData serviceIcon;
           switch (order['service']) {
             case 'barber':
-              serviceIcon = Icons.person; // Icon for barber
+              serviceIcon = Icons.person; // Use an icon for barber
               break;
             case 'nails':
-              serviceIcon = Icons.person; // Icon for nails
+              serviceIcon = Icons.spa; // Use an icon for nails
               break;
             case 'paint':
-              serviceIcon = Icons.person; // Icon for paint
+              serviceIcon = Icons.palette; // Use an icon for paint
               break;
             default:
-              serviceIcon = Icons.person; // Default icon
-              break;
+              serviceIcon = Icons.error; // Fallback icon
           }
 
           return Dismissible(
-            key: Key(order.id), // Unique key for each item
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (direction) async {
-              // Remove the item from Firestore
-              await FirebaseFirestore.instance.collection('orders').doc(
-                  order.id).delete();
-              // Remove the item from the local list
-              setState(() {
-                orders.removeAt(index);
-              });
-              // Show a snackbar message
+            key: Key(order.id),
+            background: Container(color: Colors.red),
+            onDismissed: (direction) {
+              FirebaseFirestore.instance.collection('orders').doc(order.id).delete();
+              fetchOrders(); // Refresh the list after deletion
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Appointment deleted')),
+                SnackBar(
+                  content: Text('Appointment deleted!'),
+                  duration: Duration(seconds: 3),
+                ),
               );
             },
             child: ListTile(
-              leading: Icon(serviceIcon, size: 40), // Add the icon here
-              title: Text(order['employee'] ?? 'Unknown Employee'),
-              subtitle: Text(
-                  'Service: ${order['service'] ??
-                      'N/A'}, Phone: ${order['phone'] ??
-                      'N/A'}, Date: ${order['datetime'] ?? 'N/A'}'),
+              leading: Icon(serviceIcon),
+              title: Text('${order['employee']}'),
+              subtitle: Text('${order['datetime']}'),
             ),
           );
         },
@@ -275,36 +336,12 @@ class _OrdersPageState extends State<OrdersPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Appointments'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              setState(() {
-                selectedDate =
-                    DateTime(selectedDate.year, selectedDate.month - 1);
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward),
-            onPressed: () {
-              setState(() {
-                selectedDate =
-                    DateTime(selectedDate.year, selectedDate.month + 1);
-              });
-            },
-          ),
-        ],
       ),
-      drawer: CustomDrawer(), // Assuming you have a drawer widget
+      drawer: CustomDrawer(), // Assuming you have a drawer implementation
       body: Column(
         children: [
-          Text(
-            DateFormat('MMMM yyyy').format(selectedDate),
-            style: TextStyle(fontSize: 24),
-          ),
-          buildCalendar(),
-          buildAppointmentsList(),
+          buildCalendar(), // Calendar view
+          buildAppointmentsList(), // Appointments list
         ],
       ),
     );

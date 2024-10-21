@@ -18,7 +18,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   List<Map<String, dynamic>> services = [];
   String message = '';
   final ImagePicker _picker = ImagePicker();
-  XFile? selectedImage;
+  XFile? selectedImage; // Change to a single selected image
+
+  final List<String> predefinedImageUrls = [
+    // Add your predefined image URLs here
+    'https://polskoydm.pythonanywhere.com/static/mencut.jpeg',
+    'https://polskoydm.pythonanywhere.com/static/womencut.jpeg',
+    'https://polskoydm.pythonanywhere.com/static/beardtrim.jpeg',
+    'https://polskoydm.pythonanywhere.com/static/coloring.jpeg',
+  ];
 
   @override
   void initState() {
@@ -47,7 +55,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       } else {
         setState(() {
           services = [];
-          message = 'No services found for this user.';
+          message = 'No services found';
         });
       }
     } catch (error) {
@@ -60,51 +68,109 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
   Future<void> addService() async {
     final TextEditingController nameController = TextEditingController();
-    final TextEditingController priceController = TextEditingController();
+    final TextEditingController priceController = TextEditingController(text: '1'); // Default price is 1
+    double price = 1;
+    String? selectedImageUrl;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Add Service"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                selectedImage == null
-                    ? TextButton(
-                  onPressed: () async {
-                    selectedImage = await _picker.pickImage(source: ImageSource.gallery);
-                    setState(() {});
-                  },
-                  child: Text("Select Image"),
-                )
-                    : Column(
-                  children: [
-                    Image.file(
-                      File(selectedImage!.path),
-                      height: 100,
-                      fit: BoxFit.cover,
+          content: Container(
+            width: double.maxFinite,
+            constraints: BoxConstraints(
+              maxHeight: 400,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 5,
+                      childAspectRatio: 1,
                     ),
-                    TextButton(
-                      onPressed: () async {
-                        selectedImage = await _picker.pickImage(source: ImageSource.gallery);
-                        setState(() {});
-                      },
-                      child: Text("Change Image"),
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: predefinedImageUrls.length + 1,
+                    itemBuilder: (context, index) {
+                      return index < predefinedImageUrls.length
+                          ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedImageUrl = predefinedImageUrls[index]; // Set the selected image URL
+                            selectedImage = null; // Reset selected image if a predefined one is chosen
+                          });
+                        },
+                        child: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                            border: selectedImageUrl == predefinedImageUrls[index]
+                                ? Border.all(color: Colors.blue, width: 2) // Blue border for selected image
+                                : null,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8), // Optional: Rounded corners for images
+                            child: Image.network(
+                              predefinedImageUrls[index],
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      )
+                          : IconButton(
+                        icon: Icon(Icons.add, size: 30),
+                        onPressed: () async {
+                          XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+                          if (pickedImage != null) {
+                            setState(() {
+                              selectedImage = pickedImage; // Save the selected image
+                              selectedImageUrl = null; // Reset predefined image selection
+                            });
+                          }
+                        },
+                      );
+                    },
+                  ),
+
+                  if (selectedImage != null)
+                    Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue, width: 2),
+                      ),
+                      child: Image.file(File(selectedImage!.path), fit: BoxFit.cover),
                     ),
-                  ],
-                ),
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Service'),
-                ),
-                TextField(
-                  controller: priceController,
-                  decoration: InputDecoration(labelText: 'Price'),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
+                  if (selectedImageUrl != null)
+                    Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue, width: 2),
+                      ),
+                      child: Image.network(selectedImageUrl!, fit: BoxFit.cover),
+                    ),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(labelText: 'Service'),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: priceController,
+                          decoration: InputDecoration(labelText: 'Price'),
+                          keyboardType: TextInputType.number, // Ensure numeric keypad opens
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           actions: <Widget>[
@@ -116,13 +182,17 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
             ),
             TextButton(
               onPressed: () async {
-                if (selectedImage != null &&
-                    nameController.text.isNotEmpty &&
-                    priceController.text.isNotEmpty) {
-                  String uploadImageUrl = await uploadImage(selectedImage!);
+                if ((selectedImageUrl != null || selectedImage != null) && nameController.text.isNotEmpty && priceController.text.isNotEmpty) {
+                  String uploadImageUrl;
+
+                  if (selectedImage != null) {
+                    uploadImageUrl = await uploadImage(selectedImage!);
+                  } else {
+                    uploadImageUrl = selectedImageUrl!; // Use predefined image URL
+                  }
 
                   Map<String, dynamic> serviceData = {
-                    'image': uploadImageUrl,
+                    'image': uploadImageUrl, // Store as a single image
                     'name': nameController.text,
                     'price': double.parse(priceController.text),
                     'userId': _auth.currentUser!.uid,
@@ -142,11 +212,39 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   }
 
   Future<void> deleteService(String serviceId) async {
-    try {
-      await _firestore.collection('services').doc(serviceId).delete();
-      fetchServiceDetails();
-    } catch (error) {
-      print('Error deleting service: $error');
+    // Show a confirmation dialog before deleting the service
+    bool confirm = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Deletion'),
+          content: Text('Are you sure you want to delete this service?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Proceed with deletion if confirmed
+    if (confirm) {
+      try {
+        await _firestore.collection('services').doc(serviceId).delete();
+        fetchServiceDetails();
+      } catch (error) {
+        print('Error deleting service: $error');
+      }
     }
   }
 
@@ -169,22 +267,10 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Service Details'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Navigation()),
-            );
-          },
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: message.isNotEmpty
-            ? Center(child: Text(message, style: TextStyle(fontSize: 18, color: Colors.red)))
+            ? Center(child: Text(message, style: TextStyle(fontSize: 18, color: Colors.black)))
             : services.isEmpty
             ? Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
@@ -199,20 +285,25 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
               return DataRow(cells: [
                 DataCell(
                   Image.network(
-                    service['image'],
+                    service['image'], // Access the single image URL
                     height: 50,
                     width: 50,
                     fit: BoxFit.cover,
                   ),
                 ),
                 DataCell(Text(service['name'])),
-                DataCell(Text('\$${service['price'].toStringAsFixed(2)}')),
+                DataCell(Text('\$${service['price'].toString()}')),
                 DataCell(
-                  IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      deleteService(service['id']);
-                    },
+                  Row(
+                    children: [
+
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          deleteService(service['id']);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ]);
@@ -222,7 +313,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: addService,
-        backgroundColor: Colors.blue,
         child: Icon(Icons.add),
       ),
     );

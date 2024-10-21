@@ -1,9 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart'; // Import for TapGestureRecognizer
 import 'package:driver_app/mainScreens/navigation.dart';
-import 'package:url_launcher/url_launcher.dart'; // Import for URL launcher
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+import 'package:driver_app/authentication/registration.dart';
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
+final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 class EmailLoginScreen extends StatefulWidget {
   const EmailLoginScreen({Key? key}) : super(key: key);
@@ -11,13 +13,6 @@ class EmailLoginScreen extends StatefulWidget {
   @override
   _EmailLoginScreenState createState() => _EmailLoginScreenState();
 }
-
-void _launchURL() async {
-  const url = 'https://appointmaster.vercel.app'; // Replace with your desired URL
-    await launch(url);
-
-}
-
 
 class _EmailLoginScreenState extends State<EmailLoginScreen> {
   final TextEditingController emailController = TextEditingController();
@@ -30,34 +25,65 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       setState(() {
-        errorMessage = "Please enter both email and password.";
+        errorMessage = "Please fill in all fields.";
       });
       return;
     }
 
     try {
-      final signInMethods = await _auth.fetchSignInMethodsForEmail(email);
-
-      if (signInMethods.contains('google.com')) {
-        // Handle Google account linking logic
-      }
-
+      // Sign in the user with email and password
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      if (userCredential.user != null) {
-        if (userCredential.user!.emailVerified) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Navigation()),
+      // Fetch user document from Firestore based on uid
+      final userQuery = await _firestore
+          .collection('businesses')
+          .where('uid', isEqualTo: userCredential.user!.uid)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) {
+        var userDoc = userQuery.docs.first.data(); // Get the first document's data
+        Timestamp expirationTimestamp = userDoc['sub_expiration']; // Get the expiration date
+        DateTime expirationDate = expirationTimestamp.toDate(); // Convert to DateTime
+
+        // Get the current date
+        DateTime currentDate = DateTime.now();
+
+        // Check if the current date is after the expiration date
+        if (currentDate.isAfter(expirationDate)) {
+          // Trial period has expired, sign the user out and show an alert
+          await _auth.signOut(); // Optionally sign the user out
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Trial Expired'),
+                content: Text('Your trial period has ended. Please subscribe to continue using the app.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      // Optionally navigate to subscription page here
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
           );
-        } else {
-          setState(() {
-            errorMessage = "Please verify your email address.";
-          });
+          return;
         }
+
+
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Navigation()));
+        // Store expiration date in local storage
+
+      } else {
+        setState(() {
+          errorMessage = "User document does not exist.";
+        });
       }
     } catch (e) {
       setState(() {
@@ -65,13 +91,6 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
       });
     }
   }
-
-  // Launch the registration URL
-  void _launchRegistrationUrl() async {
-    const url = 'https://appointmaster.vercel.app/register/'; // Replace with your registration URL
-    await launch(url);
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -115,72 +134,43 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                 obscureText: true,
               ),
               SizedBox(height: 20),
-              Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min, // Makes the row take the minimum width it needs
-                  children: [
-                    ElevatedButton(
-                      onPressed: signInWithEmail,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue, // Background color
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: Text(
-                        "Sign In",
-                        style: TextStyle(color: Colors.white), // Text color set to white
-                      ),
-                    ),
-
-                    SizedBox(width: 20), // Space between the two buttons
-                    OutlinedButton(
-                      onPressed: _launchURL,
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        side: BorderSide(color: Colors.green, width: 2), // Outline color and width
-                      ),
-                      child: Text(
-                        "Skip",
-                        style: TextStyle(color: Colors.green), // Text color to match the outline
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20),
-              if (errorMessage.isNotEmpty)
-                Text(
-                  errorMessage,
-                  style: TextStyle(color: Colors.red),
-                ),
-              SizedBox(height: 20),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: Colors.black, // Default text color
+              ElevatedButton(
+                onPressed: signInWithEmail,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  children: <TextSpan>[
-                    TextSpan(text: "Don't have an account? "),
-                    TextSpan(
-                      text: "Register here.",
-                      style: TextStyle(
-                        color: Colors.blue, // Change "Register here" text color to blue
-                        decoration: TextDecoration.underline,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          _launchRegistrationUrl(); // Link to registration
-                        },
-                    ),
-                  ],
+                ),
+                child: Text(
+                  "Sign In",
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistrationScreen()),
+                  );
+                },
+                child: Text(
+                  "Don't have an account? Register here",
+                  style: TextStyle(
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+              if (errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Text(
+                    errorMessage,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
             ],
           ),
         ),

@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver_app/mainScreens/bank.dart';
+import 'package:driver_app/mainScreens/service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'drawer.dart';
 class InvoiceGenerator extends StatefulWidget {
   @override
   _InvoiceGeneratorState createState() => _InvoiceGeneratorState();
@@ -78,7 +81,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               );
             } else {
               leadingIcon = IconButton(
-                icon: Icon(Icons.language),
+                icon: Icon(Icons.ios_share_outlined),
                 onPressed: () async {
                   final url =
                       'https://polskoydm.pythonanywhere.com/invoice-payment?uid=$_uid&doc=$docId&email=${data['email']}&total=${data['total']}';
@@ -144,7 +147,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
   TextEditingController businessLocationController = TextEditingController();
   TextEditingController businessPhoneController = TextEditingController();
   TextEditingController customerNameController = TextEditingController();
-   TextEditingController totalController = TextEditingController();
+  TextEditingController totalController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   List<Map<String, String>> items = [{'itemName': '', 'quantity': '1'}];
   String selectedDate = '';
@@ -153,7 +156,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
 
     Future.delayed(Duration(seconds: 1), () {
       _initSharedPreferences();
@@ -199,9 +202,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
 
   void _deleteLastCharacter() {
     setState(() {
-      if (totalController.text.isNotEmpty) {
-        totalController.text = totalController.text.substring(0, totalController.text.length - 1);
-      }
+      totalController.clear(); // Clear the text input
     });
   }
 
@@ -257,6 +258,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
 
       if (response.statusCode == 200) {
         print('Invoice sent successfully');
+        _deleteLastCharacter();
       } else {
         print('Failed to send invoice. Status code: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -277,7 +279,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Client'),
+          title: Text('Add Contact'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -297,8 +299,10 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
                   setState(() {
                     customerNameController.text = name;
                   });
+                  _saveData();
                   Navigator.of(context).pop();
                   _tabController.animateTo(1);
+
                 } else {
                   // Show an error message if name is empty
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -333,30 +337,25 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.payment_outlined), // Hamburger menu icon
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EditBankScreen()),
-            ); // Open the drawer
-          },
-        ),
-        title: Text('New Payment'),
+
+        title: Text('Checkout'),
+
         bottom: TabBar(
           controller: _tabController,
           tabs: [
             Tab(text: 'Keypad'),
-            Tab(text: 'History'),
+            Tab(text: 'Invoices'),
+            Tab(text: 'Library'),
           ],
         ),
       ),
-
+      drawer: CustomDrawer(),
       body: TabBarView(
         controller: _tabController,
         children: [
           _buildKeypadTab(),
-          HistoryScreen(), // Ensure HistoryScreen is properly defined
+          HistoryScreen(),
+          ServiceDetailsScreen(),
         ],
       ),
     );
@@ -366,7 +365,7 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
     return Container(
       padding: EdgeInsets.all(20.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(height: 5.0),
           Center(
@@ -376,123 +375,36 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
                 Container(
                   width: 300,
                   padding: EdgeInsets.all(10.0),
-                  color: Colors.grey[200],
                   child: Center(
                     child: TextField(
                       controller: totalController,
                       keyboardType: TextInputType.none,
                       decoration: InputDecoration(
-                        labelText: 'Price',
+                        labelText: 'Total',
                         border: OutlineInputBorder(),
                       ),
                       readOnly: true,
-                      onChanged: (value) {
-
-                      },
+                      onChanged: (value) {},
                       onEditingComplete: () {
                         FocusScope.of(context).unfocus();
                       },
                     ),
                   ),
                 ),
-                SizedBox(height: 8.0),
+                SizedBox(height: 30.0),
                 Container(
                   width: 300,
-                  height: 450,
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 2.0,
-                      mainAxisSpacing: 2.0,
-                    ),
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: 12,
-                    itemBuilder: (context, index) {
-                      if (index < 9) {
-                        String number = (index + 1).toString();
-                        return Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: ElevatedButton(
-                              onPressed: () => _addNumber(number),
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(70, 70),
-                                backgroundColor: Colors.black54,
-                                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              child: Text(
-                                number,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        );
-                      } else if (index == 10) {
-                        return Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: ElevatedButton(
-                              onPressed: () => _addNumber('0'),
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(70, 70),
-                                backgroundColor: Colors.black54,
-                                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              child: Text(
-                                '0',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        );
-                      } else if (index == 9) {
-                        return Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: ElevatedButton(
-                              onPressed: _deleteLastCharacter,
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(70, 70),
-                                backgroundColor: Colors.red,
-                                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              child: Icon(
-                                Icons.backspace,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        );
-                      } // Change the OK button logic
-                      else {
-                        return Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(2.0),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                // First show the dialog to get the client name
-                                await _showAddDetailsDialog();
-                                // Then validate fields and save data if valid
-                                if (_validateFields()) {
-                                  _saveData();
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(70, 70),
-                                backgroundColor: Colors.black,
-                                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              child: Text(
-                                'OK',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-
-                    },
+                  height: 400,
+                  child: Column(
+                    children: [
+                      _buildKeypadRow(['1', '2', '3']),
+                      Divider(height: 1, color: Colors.grey),
+                      _buildKeypadRow(['4', '5', '6']),
+                      Divider(height: 1, color: Colors.grey),
+                      _buildKeypadRow(['7', '8', '9']),
+                      Divider(height: 1, color: Colors.grey),
+                      _buildKeypadRow(['X', '0', '>']),
+                    ],
                   ),
                 ),
               ],
@@ -502,5 +414,44 @@ class _InvoiceGeneratorState extends State<InvoiceGenerator> with SingleTickerPr
       ),
     );
   }
+
+  Widget _buildKeypadRow(List<String> keys) {
+    return Expanded(
+      child: Row(
+        children: [
+          for (var i = 0; i < keys.length; i++) ...[
+            if (i != 0) VerticalDivider(width: 1, color: Colors.grey), // Add vertical divider between buttons
+            Expanded(child: _buildKeypadButton(keys[i])),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKeypadButton(String text) {
+    bool isDelete = text == 'X';
+    bool isOk = text == '>';
+
+    return GestureDetector(
+      onTap: () {
+        if (isDelete) {
+          _deleteLastCharacter();
+        } else if (isOk) {
+            _showAddDetailsDialog();
+        } else {
+          _addNumber(text);
+        }
+      },
+      child: Container(
+        color: Colors.transparent, // Make the button invisible
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24, color: Colors.black),
+        ),
+      ),
+    );
+  }
+
 
 }

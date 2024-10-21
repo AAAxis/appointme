@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
-import 'package:driver_app/authentication/email_login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:driver_app/authentication/hello.dart';
+import 'package:driver_app/mainScreens/inpurchase.dart';
+import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:driver_app/mainScreens/navigation.dart';
-import 'package:url_launcher/url_launcher.dart'; // Add this to handle the link
 
 class MySplashScreen extends StatefulWidget {
   const MySplashScreen({Key? key}) : super(key: key);
@@ -40,26 +41,54 @@ class _MySplashScreenState extends State<MySplashScreen> {
       User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Navigation()),
-        );
+        // User is logged in, check trial expiration
+        final userQuery = await FirebaseFirestore.instance
+            .collection('businesses')
+            .where('uid', isEqualTo: user.uid)
+            .get();
+
+        if (userQuery.docs.isNotEmpty) {
+          final userDoc = userQuery.docs.first.data();
+          Timestamp expirationTimestamp = userDoc['sub_expiration']; // Get expiration date
+          DateTime expirationDate = expirationTimestamp.toDate(); // Convert to DateTime
+
+          // Get the current date
+          DateTime currentDate = DateTime.now();
+
+          // Check if the current date is after the expiration date
+          if (currentDate.isAfter(expirationDate)) {
+            // Trial has expired, navigate to subscription page
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => InAppPurchasePage()), // Replace with your Subscription page
+            );
+          } else {
+            // Trial is still active, navigate to appointments page
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => Navigation()),
+            );
+          }
+        } else {
+          // If no user document found, handle it (e.g., show an error or sign out the user)
+          _requestPermissionManually();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()), // Replace with LoginScreen
+          );
+        }
       } else {
+        // No user logged in, navigate to login screen
         _requestPermissionManually();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => EmailLoginScreen()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       }
     });
   }
 
-  Future<void> _launchURL() async {
-    const _url = 'https://buymeacoffee.com/theholylabs';
 
-      await launch(_url);
-
-  }
 
   @override
   Widget build(BuildContext context) {

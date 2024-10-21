@@ -24,7 +24,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace 'com.theholylabs.appointme'
+    namespace 'com.theholylabs.ampm'
 
     signingConfigs {
         release {
@@ -56,13 +56,13 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.theholylabs.appointme"
+        applicationId "com.theholylabs.ampm"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 19
-        versionName "3.1"
+        versionCode 1
+        versionName "1"
         multiDexEnabled true
         minSdkVersion 28
     }

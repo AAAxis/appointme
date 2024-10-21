@@ -1,9 +1,10 @@
-import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'drawer.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -74,17 +75,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notifications'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (c) => Navigation()),
-            );
-          },
-        ),
+
       ),
+      drawer: CustomDrawer(),
       body: StreamBuilder<QuerySnapshot>(
         stream: _notificationsStream,
         builder: (context, snapshot) {
