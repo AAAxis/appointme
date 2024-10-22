@@ -60,7 +60,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
             // Trial has expired, navigate to subscription page
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => InAppPurchasePage()), // Replace with your Subscription page
+              MaterialPageRoute(builder: (context) => SubscriptionScreen()), // Replace with your Subscription page
             );
           } else {
             // Trial is still active, navigate to appointments page

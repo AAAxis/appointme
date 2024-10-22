@@ -73,7 +73,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           'phone': 'N/A',
           'service': selectedBusinessType,
           'uid': uid,
-          'status': 'disabled',
+          'status': 'kKe8EGkty2uA0Dk2ROD5',
           'created': FieldValue.serverTimestamp(),
           'sub_expiration': Timestamp.fromDate(trialEndDate),
         });

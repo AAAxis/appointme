@@ -167,7 +167,7 @@ class CustomDrawer extends StatelessWidget {
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (c) => InAppPurchasePage()),
+              MaterialPageRoute(builder: (c) => SubscriptionScreen()),
             );
           },
         ),

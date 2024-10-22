@@ -1,4 +1,4 @@
-import 'package:driver_app/authentication/hello.dart';
+import 'package:driver_app/authentication/email_login.dart';
 import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+
+
+
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -45,13 +48,6 @@ class _ProfileFormState extends State<ProfileForm> {
   File? _logoImage; // To store the uploaded logo image
   bool isLoading = false;
 
-  // For email verification
-  User? user;
-  bool emailVerified = false;
-
-  // Visibility status
-  bool websiteVisible = true; // Default value for website visibility
-
   @override
   void initState() {
     super.initState();
@@ -60,10 +56,10 @@ class _ProfileFormState extends State<ProfileForm> {
 
   void _loadBusinessInfo() async {
     try {
-      user = FirebaseAuth.instance.currentUser;
+      User? user = FirebaseAuth.instance.currentUser;
 
       if (user != null) {
-        String uid = user!.uid;
+        String uid = user.uid;
 
         // Query to find the document by UID in the businesses collection
         QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -82,10 +78,6 @@ class _ProfileFormState extends State<ProfileForm> {
           _phoneController.text = data['phone'] ?? 'N/A';
           _businessNameController.text = data['business_name'] ?? 'N/A';
           logoUrl = data['image_url'] ?? null; // Store the logo URL
-          websiteVisible = data['status'] ?? true; // Load the visibility status
-
-          // Check email verification status
-          emailVerified = user!.emailVerified;
 
           // Logging fetched data
           print("Fetched data: ${doc.data()}");
@@ -146,7 +138,6 @@ class _ProfileFormState extends State<ProfileForm> {
       }
     }
   }
-
   void _saveLogoUrl(String url) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -168,34 +159,6 @@ class _ProfileFormState extends State<ProfileForm> {
       }
     }
   }
-
-  // Method to update website visibility status
-  void _updateVisibilityStatus(bool value) async {
-    setState(() {
-      websiteVisible = value;
-    });
-
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String uid = user.uid;
-
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('businesses')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      if (snapshot.docs.isNotEmpty) {
-        String documentId = snapshot.docs.first.id;
-
-        await FirebaseFirestore.instance.collection('businesses').doc(documentId).set({
-          'status': websiteVisible, // Save visibility status
-        }, SetOptions(merge: true));
-
-        print('Visibility status updated to: $websiteVisible');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -216,58 +179,38 @@ class _ProfileFormState extends State<ProfileForm> {
           SizedBox(height: 20),
           _buildTextField('Service', Icons.business_center, _serviceController),
           SizedBox(height: 20),
-
-          // Website visibility switch
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Deploy Website'),
-              Switch(
-                value: websiteVisible,
-                onChanged: (value) {
-                  _updateVisibilityStatus(value);
-                },
+          Align(
+            alignment: Alignment.centerLeft,
+            child: ElevatedButton(
+              onPressed: () {
+                _saveBusinessInfo();
+              },
+              style: ButtonStyle(
+                side: MaterialStateProperty.all(BorderSide(color: Colors.black)),
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+                elevation: MaterialStateProperty.all(0),
               ),
-            ],
+              child: Text(
+                'Save',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
           ),
-          SizedBox(height: 20),
-
-
-// Row to contain both buttons
-          Row(
-
-            children: [
-              // Save button
-              ElevatedButton(
-                onPressed: () {
-                  _saveBusinessInfo();
-                },
-                style: ButtonStyle(
-                  side: MaterialStateProperty.all(BorderSide(color: Colors.black)),
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                  elevation: MaterialStateProperty.all(0),
-                ),
-                child: Text(
-                  'Save',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-              SizedBox(width: 10),
-              // Delete Account button
-              ElevatedButton.icon(
-                onPressed: () {
-                  _confirmDeleteAccount(context);
-                },
-                icon: Icon(Icons.delete), // Icon for delete button
-                label: Text('Delete Account'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white, // Set the button color to white
-                ),
-              ),
-            ],
+          SizedBox(height: 80),
+          // Show "Delete Account" button
+          TextButton(
+            onPressed: () {
+              _confirmDeleteAccount(context);
+            },
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              foregroundColor: Colors.red,
+            ),
+            child: Text(
+              'Delete Account',
+              style: TextStyle(fontSize: 12),
+            ),
           ),
-
-
         ],
       ),
     );
@@ -276,7 +219,6 @@ class _ProfileFormState extends State<ProfileForm> {
   Widget _buildTextField(String label, IconData icon, TextEditingController controller) {
     return TextFormField(
       controller: controller,
-      readOnly: dataExists,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
@@ -302,82 +244,111 @@ class _ProfileFormState extends State<ProfileForm> {
                   fit: BoxFit.cover,
                 ),
               ),
-              // Icon for picking a new image
               Positioned(
-                bottom: 10,
-                right: 10,
-                child: GestureDetector(
-                  onTap: _pickLogoImage,
-                  child: Icon(Icons.camera_alt, color: Colors.white),
+                bottom: 8,
+                right: 8,
+                child: IconButton(
+                  icon: Icon(Icons.edit, color: Colors.white),
+                  onPressed: _pickLogoImage, // Allow user to upload a new image
                 ),
               ),
             ],
           )
-              : GestureDetector(
-            onTap: _pickLogoImage,
-            child: CircleAvatar(
-              radius: 70,
-              backgroundColor: Colors.grey[300],
-              child: Icon(Icons.camera_alt, color: Colors.grey[800]),
-            ),
+              : Container(
+            width: 100,
+            height: 100,
+            color: Colors.grey[300],
+            child: Icon(Icons.image, size: 50, color: Colors.grey[600]),
           ),
-          SizedBox(height: 10), // Adjust the bottom spacing as needed
+          SizedBox(height: 10),
         ],
       ),
     );
   }
 
+
   void _saveBusinessInfo() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String uid = user.uid;
 
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('businesses')
-            .where('uid', isEqualTo: uid)
-            .get();
-
-        if (snapshot.docs.isNotEmpty) {
-          String documentId = snapshot.docs.first.id;
-
-          await FirebaseFirestore.instance.collection('businesses').doc(documentId).set({
-            'address': _addressController.text,
-            'instagram': _instagramController.text,
-            'service': _serviceController.text,
-            'phone': _phoneController.text,
-            'business_name': _businessNameController.text,
-            'status': websiteVisible, // Save visibility status
-          }, SetOptions(merge: true));
-
-          print('Business information saved');
-        }
+      if (user == null) {
+        print('User not authenticated.');
+        return;
       }
+
+      String uid = user.uid;
+
+      String address = _addressController.text.isEmpty ? 'N/A' : _addressController.text;
+      String instagram = _instagramController.text.isEmpty ? 'N/A' : _instagramController.text;
+      String phone = _phoneController.text.isEmpty ? 'N/A' : _phoneController.text;
+      String businessName = _businessNameController.text.isEmpty ? 'N/A' : _businessNameController.text;
+      String service = _serviceController.text.isEmpty ? 'N/A' : _serviceController.text;
+
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('businesses')
+          .where('uid', isEqualTo: uid)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        String documentId = snapshot.docs.first.id;
+
+        await FirebaseFirestore.instance
+            .collection('businesses')
+            .doc(documentId)
+            .set({
+          'address': address,
+          'instagram': instagram,
+          'phone': phone,
+          'business_name': businessName,
+          'service': service,
+          // You might also want to save the logo URL here if uploaded
+          // 'image_url': logoUrl,
+        }, SetOptions(merge: true));
+
+        print('Business information updated in Firestore');
+
+        // Show Snackbar on success
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Business information updated successfully!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        print('No business information found for this user.');
+      }
+
+      setState(() {
+        dataExists = true;
+      });
     } catch (e) {
-      print('Error saving business information: $e');
+      print('Error updating business information: $e');
     }
   }
 
   void _confirmDeleteAccount(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Delete'),
-          content: Text('Are you sure you want to delete your account? This action cannot be undone.'),
-          actions: [
+          title: Text("Delete Account"),
+          content: Text("Are you sure you want to delete your account? This action cannot be undone."),
+          actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Dismiss the dialog
               },
-              child: Text('Cancel'),
+              child: Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                _deleteAccount();
-                Navigator.of(context).pop();
+                _deleteAccount(); // Proceed with account deletion
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EmailLoginScreen()),
+                );
               },
-              child: Text('Delete'),
+              child: Text("Delete", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -386,30 +357,21 @@ class _ProfileFormState extends State<ProfileForm> {
   }
 
   void _deleteAccount() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      String uid = user.uid;
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
 
-      // Delete user from Firebase Auth
-      await user.delete();
+      if (user != null) {
+        String uid = user.uid;
 
-      // Delete user's business document from Firestore
-      await FirebaseFirestore.instance
-          .collection('businesses')
-          .where('uid', isEqualTo: uid)
-          .get()
-          .then((snapshot) {
-        for (var doc in snapshot.docs) {
-          doc.reference.delete();
-        }
-      });
+        // Delete user's business document from Firestore
+        await FirebaseFirestore.instance.collection('businesses').doc(uid).delete();
+        await user.delete();
 
-      print('Account deleted successfully');
-      // Optionally navigate to a different screen after deletion
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
+        print('Account deleted successfully.');
+        // You can also sign the user out here if needed
+      }
+    } catch (e) {
+      print('Error deleting account: $e');
     }
   }
 }

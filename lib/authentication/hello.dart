@@ -28,47 +28,66 @@ class _LoginScreenState extends State<LoginScreen> {
   ];
 
   Future<void> promptForBusinessName() async {
+    // Preselect "Barber Shop" and initialize a disabled submit button
+    setState(() {
+      selectedBusinessType = "Barber Shop";
+    });
+
+    bool isSubmitEnabled = false;
+
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text("Business Name"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _businessNameController,
-                decoration: InputDecoration(hintText: "Enter Business Name"),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Business Name"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _businessNameController,
+                    decoration: InputDecoration(hintText: "Enter Business Name"),
+                    onChanged: (value) {
+                      setState(() {
+                        // Enable the button if business name has 3 or more characters
+                        isSubmitEnabled = value.trim().length >= 3;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    value: selectedBusinessType,
+                    hint: Text("Select Business Type"),
+                    items: businessTypes.map((type) {
+                      return DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedBusinessType = newValue;
+                      });
+                    },
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: selectedBusinessType,
-                hint: Text("Select Business Type"),
-                items: businessTypes.map((type) {
-                  return DropdownMenuItem<String>(
-                    value: type,
-                    child: Text(type),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedBusinessType = newValue;
-                  });
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  businessName = _businessNameController.text.trim();
-                });
-                Navigator.of(context).pop();
-              },
-              child: Text("Submit"),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: isSubmitEnabled
+                      ? () {
+                    setState(() {
+                      businessName = _businessNameController.text.trim();
+                    });
+                    Navigator.of(context).pop();
+                  }
+                      : null, // Disable the button if conditions are not met
+                  child: Text("Submit"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -100,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
         'phone': 'N/A',
         'service': selectedBusinessType,
         'address': 'N/A',
-        'status': 'disabled',
+        'status': 'kKe8EGkty2uA0Dk2ROD5',
         'image_url': 'https://polskoydm.pythonanywhere.com/static/index.png',
         'background': 'https://polskoydm.pythonanywhere.com/static/background.png',
         'created': FieldValue.serverTimestamp(),

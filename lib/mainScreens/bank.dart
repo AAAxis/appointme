@@ -18,7 +18,7 @@ class EditBankScreen extends StatelessWidget {
             );
           },
         ),
-        title: Text('Edit Bank Info'),
+        title: Text('Edit Bank'),
       ),
       body: BankInfoForm(),
     );
