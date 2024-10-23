@@ -5,7 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="be10626d-892b-4ccc-951e-e12bc8164cba" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/.filecache" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/.filecache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/App.framework.dSYM/Contents/Resources/DWARF/App" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/App.framework.dSYM/Contents/Resources/DWARF/App" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/App.framework/App" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/App.framework/App" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/app.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/app.dill" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/App.framework.dSYM/Contents/Resources/DWARF/App" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/App.framework.dSYM/Contents/Resources/DWARF/App" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/App.framework.dSYM/Contents/Resources/Relocations/aarch64/App.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/App.framework.dSYM/Contents/Resources/Relocations/aarch64/App.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/App.framework/App" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/App.framework/App" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/snapshot_assembly.S" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/snapshot_assembly.S" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/snapshot_assembly.o" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/arm64/snapshot_assembly.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/flutter_assets.d" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/flutter_assets.d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/program.dill" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/program.dill" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/release_ios_bundle_flutter_assets.stamp" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/flutter_build/d8f77294a60de37499b7c1e76fba2e15/release_ios_bundle_flutter_assets.stamp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/mainScreens/drawer.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/mainScreens/drawer.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

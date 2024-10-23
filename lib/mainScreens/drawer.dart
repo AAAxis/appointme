@@ -157,21 +157,6 @@ class CustomDrawer extends StatelessWidget {
                 },
               ),
 
-        ListTile(
-        leading: const Icon(Icons.play_circle_outline, color: Colors.black),
-        title: const Text(
-        "Subscription",
-        style: TextStyle(color: Colors.black),
-        ),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (c) => SubscriptionScreen()),
-            );
-          },
-        ),
-
 
               ListTile(
                 leading: const Icon(Icons.credit_card, color: Colors.black),
