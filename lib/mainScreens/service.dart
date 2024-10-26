@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:driver_app/mainScreens/navigation.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class ServiceDetailsScreen extends StatefulWidget {
   @override
@@ -18,250 +16,202 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
   List<Map<String, dynamic>> services = [];
   String message = '';
   final ImagePicker _picker = ImagePicker();
-  XFile? selectedImage; // Change to a single selected image
+  XFile? selectedImage;
 
   final List<String> predefinedImageUrls = [
-    // Add your predefined image URLs here
     'https://polskoydm.pythonanywhere.com/static/mencut.jpeg',
     'https://polskoydm.pythonanywhere.com/static/womencut.jpeg',
     'https://polskoydm.pythonanywhere.com/static/beardtrim.jpeg',
     'https://polskoydm.pythonanywhere.com/static/coloring.jpeg',
   ];
 
+  // Preselect the first image URL
+  String? selectedImageUrl;
+
   @override
   void initState() {
     super.initState();
     fetchServiceDetails();
+    selectedImageUrl = predefinedImageUrls[0]; // Preselect the first image
   }
 
   Future<void> fetchServiceDetails() async {
-    final currentUserId = _auth.currentUser!.uid;
-
     try {
-      QuerySnapshot snapshot = await _firestore
+      QuerySnapshot querySnapshot = await _firestore
           .collection('services')
-          .where('userId', isEqualTo: currentUserId)
+          .where('userId', isEqualTo: _auth.currentUser!.uid)
           .get();
 
-      if (snapshot.docs.isNotEmpty) {
-        services = snapshot.docs.map((doc) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return data;
-        }).toList();
-        setState(() {
-          message = '';
-        });
-      } else {
-        setState(() {
-          services = [];
-          message = 'No services found';
-        });
-      }
-    } catch (error) {
-      print('Error fetching service details: $error');
       setState(() {
-        message = 'Error fetching service details. Please try again later.';
+        services = querySnapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            'image': doc['image'],
+            'name': doc['name'],
+            'price': doc['price'],
+          };
+        }).toList();
+        message = services.isEmpty ? 'No services found.' : '';
+      });
+    } catch (e) {
+      setState(() {
+        message = 'Failed to load services.';
       });
     }
+  }
+
+  Future<void> deleteService(String id) async {
+    await _firestore.collection('services').doc(id).delete();
+    fetchServiceDetails();
+  }
+
+  Future<String> uploadImage(XFile image) async {
+    // Implement your image upload logic here
+    // This function should return the uploaded image URL
+    return "uploaded_image_url"; // Placeholder
   }
 
   Future<void> addService() async {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController priceController = TextEditingController(text: '1'); // Default price is 1
-    double price = 1;
-    String? selectedImageUrl;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add Service"),
-          content: Container(
-            width: double.maxFinite,
-            constraints: BoxConstraints(
-              maxHeight: 400,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      childAspectRatio: 1,
-                    ),
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: predefinedImageUrls.length + 1,
-                    itemBuilder: (context, index) {
-                      return index < predefinedImageUrls.length
-                          ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedImageUrl = predefinedImageUrls[index]; // Set the selected image URL
-                            selectedImage = null; // Reset selected image if a predefined one is chosen
-                          });
+        return StatefulBuilder( // Using StatefulBuilder to maintain state within the dialog
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Add Service"),
+              content: Container(
+                width: double.maxFinite,
+                constraints: BoxConstraints(
+                  maxHeight: 450,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 5,
+                          childAspectRatio: 1,
+                        ),
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: predefinedImageUrls.length + 1, // +1 for custom image picker
+                        itemBuilder: (context, index) {
+                          return index < predefinedImageUrls.length
+                              ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedImageUrl = predefinedImageUrls[index]; // Select predefined image
+                                selectedImage = null; // Reset custom image selection
+                              });
+                            },
+                            child: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8), // Fixed radius
+                                border: selectedImageUrl == predefinedImageUrls[index]
+                                    ? Border.all(color: Colors.blue, width: 2) // Show blue border for selected image
+                                    : Border.all(color: Colors.transparent, width: 2), // No border for unselected
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8), // Fixed radius
+                                child: Image.network(
+                                  predefinedImageUrls[index],
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          )
+                              : GestureDetector(
+                            onTap: () async {
+                              XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+                              if (pickedImage != null) {
+                                setState(() {
+                                  selectedImage = pickedImage; // Set custom image
+                                  selectedImageUrl = null; // Reset predefined image selection
+                                });
+                              }
+                            },
+                            child: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: selectedImage != null
+                                    ? Border.all(color: Colors.blue, width: 2) // Blue border when custom image is selected
+                                    : Border.all(color: Colors.transparent, width: 2), // Transparent border when not selected
+                              ),
+                              child: Icon(Icons.add, size: 30), // Add icon
+                            ),
+                          );
                         },
-                        child: Container(
-                          height: 30,
-                          width: 30,
-                          decoration: BoxDecoration(
-                            border: selectedImageUrl == predefinedImageUrls[index]
-                                ? Border.all(color: Colors.blue, width: 2) // Blue border for selected image
-                                : null,
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8), // Optional: Rounded corners for images
-                            child: Image.network(
-                              predefinedImageUrls[index],
-                              fit: BoxFit.cover,
+                      ),
+                      TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(labelText: 'Service'),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: priceController,
+                              decoration: InputDecoration(labelText: 'Price'),
+                              keyboardType: TextInputType.number, // Ensure numeric keypad opens
                             ),
                           ),
-                        ),
-                      )
-                          : IconButton(
-                        icon: Icon(Icons.add, size: 30),
-                        onPressed: () async {
-                          XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-                          if (pickedImage != null) {
-                            setState(() {
-                              selectedImage = pickedImage; // Save the selected image
-                              selectedImageUrl = null; // Reset predefined image selection
-                            });
-                          }
-                        },
-                      );
-                    },
-                  ),
-
-                  if (selectedImage != null)
-                    Container(
-                      height: 30,
-                      width: 30,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue, width: 2),
-                      ),
-                      child: Image.file(File(selectedImage!.path), fit: BoxFit.cover),
-                    ),
-                  if (selectedImageUrl != null)
-                    Container(
-                      height: 30,
-                      width: 30,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue, width: 2),
-                      ),
-                      child: Image.network(selectedImageUrl!, fit: BoxFit.cover),
-                    ),
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(labelText: 'Service'),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: priceController,
-                          decoration: InputDecoration(labelText: 'Price'),
-                          keyboardType: TextInputType.number, // Ensure numeric keypad opens
-                        ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () async {
-                if ((selectedImageUrl != null || selectedImage != null) && nameController.text.isNotEmpty && priceController.text.isNotEmpty) {
-                  String uploadImageUrl;
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if ((selectedImageUrl != null || selectedImage != null) &&
+                        nameController.text.isNotEmpty &&
+                        priceController.text.isNotEmpty) {
+                      String uploadImageUrl;
 
-                  if (selectedImage != null) {
-                    uploadImageUrl = await uploadImage(selectedImage!);
-                  } else {
-                    uploadImageUrl = selectedImageUrl!; // Use predefined image URL
-                  }
+                      if (selectedImage != null) {
+                        uploadImageUrl = await uploadImage(selectedImage!);
+                      } else {
+                        uploadImageUrl = selectedImageUrl!; // Use predefined image URL
+                      }
 
-                  Map<String, dynamic> serviceData = {
-                    'image': uploadImageUrl, // Store as a single image
-                    'name': nameController.text,
-                    'price': double.parse(priceController.text),
-                    'userId': _auth.currentUser!.uid,
-                  };
+                      Map<String, dynamic> serviceData = {
+                        'image': uploadImageUrl,
+                        'name': nameController.text,
+                        'price': double.parse(priceController.text),
+                        'userId': _auth.currentUser!.uid,
+                      };
 
-                  await _firestore.collection('services').add(serviceData);
-                  Navigator.of(context).pop();
-                  fetchServiceDetails();
-                }
-              },
-              child: Text("Add"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> deleteService(String serviceId) async {
-    // Show a confirmation dialog before deleting the service
-    bool confirm = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Confirm Deletion'),
-          content: Text('Are you sure you want to delete this service?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: Text('Delete'),
-            ),
-          ],
+                      await _firestore.collection('services').add(serviceData);
+                      Navigator.of(context).pop();
+                      fetchServiceDetails();
+                    }
+                  },
+                  child: Text("Add"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
 
-    // Proceed with deletion if confirmed
-    if (confirm) {
-      try {
-        await _firestore.collection('services').doc(serviceId).delete();
-        fetchServiceDetails();
-      } catch (error) {
-        print('Error deleting service: $error');
-      }
-    }
-  }
 
-  Future<String> uploadImage(XFile image) async {
-    try {
-      final storageRef = FirebaseStorage.instance.ref();
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final imageRef = storageRef.child('services/$fileName');
-
-      await imageRef.putFile(File(image.path));
-
-      String downloadUrl = await imageRef.getDownloadURL();
-      return downloadUrl;
-    } catch (error) {
-      print('Error uploading image: $error');
-      return '';
-    }
   }
 
   @override
@@ -296,7 +246,6 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                 DataCell(
                   Row(
                     children: [
-
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
