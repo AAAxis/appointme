@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver_app/authentication/hello.dart';
+import 'package:driver_app/mainScreens/appointments.dart';
 import 'package:driver_app/mainScreens/bank.dart';
 import 'package:driver_app/mainScreens/employess.dart';
-import 'package:driver_app/mainScreens/inpurchase.dart';
+import 'package:driver_app/mainScreens/invoice.dart';
 import 'package:driver_app/mainScreens/notifications.dart';
+
 import 'package:driver_app/mainScreens/profile.dart';
 import 'package:driver_app/mainScreens/service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'business_page.dart';
 import 'working_hours.dart';
 
 class BusinessInfo {
@@ -95,7 +99,7 @@ class CustomDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.person, color: Colors.black),
                 title: const Text(
-                  "My Profile",
+                  "Edir Profile",
                   style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
@@ -107,29 +111,23 @@ class CustomDrawer extends StatelessWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.store_mall_directory_rounded, color: Colors.black),
+                leading: const Icon(Icons.calendar_today_rounded, color: Colors.black),
                 title: const Text(
-                  "My Website",
+                  "My Appointments",
                   style: TextStyle(color: Colors.black),
                 ),
-                onTap: () async {
-                  // Use businessInfo.docId here
-                  final String docId = businessInfo.docId; // Get the document ID
-                  if (docId.isNotEmpty) {
-                    // Construct the URL using the docId
-                    final String url = 'https://appointmaster.vercel.app/barbershop/$docId';
-                    final Uri uri = Uri.parse(url); // Create a Uri object
-                    await launch(uri.toString()); // Launch the URL
-                  } else {
-                    // Show a Snackbar if no business was found
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Business not found")),
-                    );
-                  }
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentsPage(), // Correctly pass docId
+                    ),
+                  );
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.timelapse, color: Colors.black),
+                leading: const Icon(Icons.access_time_rounded, color: Colors.black),
                 title: const Text(
                   "Working Hours",
                   style: TextStyle(color: Colors.black),
@@ -145,7 +143,7 @@ class CustomDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.people_alt_outlined, color: Colors.black),
                 title: const Text(
-                  "Employees",
+                  "My Employees",
                   style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
@@ -158,17 +156,46 @@ class CustomDrawer extends StatelessWidget {
               ),
 
 
+
               ListTile(
-                leading: const Icon(Icons.credit_card, color: Colors.black),
+                leading: const Icon(Icons.library_books_rounded, color: Colors.black),
                 title: const Text(
-                  "Payout Method",
+                  "Services Library",
                   style: TextStyle(color: Colors.black),
                 ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (c) => EditBankScreen()),
+                    MaterialPageRoute(builder: (c) => ServiceDetailsScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.credit_card, color: Colors.black),
+                title: const Text(
+                  "Checkout",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (c) => InvoiceGenerator()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                title: const Text(
+                  "Notifications",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (c) => NotificationScreen()),
                   );
                 },
               ),

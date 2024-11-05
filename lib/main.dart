@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:driver_app/authentication/email_login.dart';
+import 'package:driver_app/mainScreens/business_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,6 +45,8 @@ Future<void> main() async
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,1 @@
+ /Users/admin/Documents/GitHub/appointme/.dart_tool/flutter_build/7e6997643df74e973630cf2310b36825/native_assets.yaml: 

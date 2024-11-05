@@ -1,4 +1,3 @@
-import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -95,12 +94,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Hardcoded image display
-                    Image.network(
-                      hardcodedImageUrl,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(labelText: 'Name'),
@@ -173,7 +166,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     selectedServiceIds.isNotEmpty) { // Ensure at least one service is selected
                   // Create the employee data with the hardcoded image URL
                   Map<String, dynamic> employeeData = {
-                    'image': hardcodedImageUrl,
                     'name': nameController.text,
                     'phone': phoneController.text,
                     'userId': _auth.currentUser!.uid,
@@ -228,15 +220,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Employees'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Navigation()),
-            );
-          },
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -252,12 +235,13 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
                 contentPadding: const EdgeInsets.all(16),
-                leading: Image.network(
-                  employee['image'],
-                  width: 50,
-                  height: 50,
+                leading: // Hardcoded image display
+                Image.asset(
+                  'images/images.jpeg',  // Replace with your actual image path
+                  height: 100,
                   fit: BoxFit.cover,
                 ),
+
                 title: Text(employee['name']),
                 subtitle: Text(
                   '${employee['phone']} (Service IDs: ${employee['services']?.join(", ") ?? 'None'})',

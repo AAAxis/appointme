@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver_app/authentication/hello.dart';
+import 'package:driver_app/mainScreens/business_page.dart';
 import 'package:driver_app/mainScreens/inpurchase.dart';
-import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,11 +63,11 @@ class _MySplashScreenState extends State<MySplashScreen> {
               MaterialPageRoute(builder: (context) => SubscriptionScreen()), // Replace with your Subscription page
             );
           } else {
-            // Trial is still active, navigate to appointments page
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => Navigation()),
+              MaterialPageRoute(builder: (context) => BarbershopPage()), // Replace with your Subscription page
             );
+            // Trial is still active, navigate to appointments page
           }
         } else {
           // If no user document found, handle it (e.g., show an error or sign out the user)

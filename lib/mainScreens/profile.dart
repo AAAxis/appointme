@@ -1,5 +1,4 @@
 import 'package:driver_app/authentication/email_login.dart';
-import 'package:driver_app/mainScreens/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,15 +14,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Navigation()),
-            );
-          },
-        ),
+
         title: Text('Edit Profile'),
       ),
       body: ProfileForm(),

@@ -74,10 +74,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
-
+        title: Text('My Notifications'),
       ),
-      drawer: CustomDrawer(),
       body: StreamBuilder<QuerySnapshot>(
         stream: _notificationsStream,
         builder: (context, snapshot) {

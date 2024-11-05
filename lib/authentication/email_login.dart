@@ -1,4 +1,4 @@
-import 'package:driver_app/mainScreens/navigation.dart';
+import 'package:driver_app/mainScreens/business_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
@@ -77,7 +77,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
         }
 
 
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Navigation()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BarbershopPage()));
         // Store expiration date in local storage
 
       } else {

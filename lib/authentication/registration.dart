@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:driver_app/mainScreens/navigation.dart';
+import 'package:driver_app/mainScreens/business_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -127,10 +127,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           'workingHours': defaultWorkingHours,
         });
 
+
+        // Add a default employee document to Firestore
+        await _firestore.collection('employees').add({
+          'name': 'Andrey',
+          'phone': '+972547337857',
+          'image': 'https://png.pngtree.com/png-vector/20231201/ourmid/pngtree-vector-office-worker-staff-avatar-employee-icon-png-image_10796991.png',
+          'userId': uid,
+        });
+
         // Navigate to the main app or another screen after registration
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Navigation()),
+          MaterialPageRoute(builder: (context) => BarbershopPage()),
         );
       }
     } catch (e) {

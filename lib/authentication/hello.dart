@@ -1,6 +1,6 @@
 import 'dart:io'; // For platform detection
 import 'package:driver_app/authentication/email_login.dart';
-import 'package:driver_app/mainScreens/navigation.dart';
+import 'package:driver_app/mainScreens/business_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -177,6 +177,15 @@ class _LoginScreenState extends State<LoginScreen> {
         'workingHours': defaultWorkingHours,
       });
 
+
+      // Add a default employee document to Firestore
+      await _firestore.collection('employees').add({
+        'name': 'Andrey',
+        'phone': '+972547337857',
+        'image': 'https://png.pngtree.com/png-vector/20231201/ourmid/pngtree-vector-office-worker-staff-avatar-employee-icon-png-image_10796991.png',
+        'userId': user.uid,
+      });
+
     } else {
       final businessData = userQuery.docs.first.data();
       final expirationDate = (businessData['sub_expiration'] as Timestamp).toDate();
@@ -195,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // Navigate to the main app
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => Navigation()),
+      MaterialPageRoute(builder: (context) => BarbershopPage()),
     );
   }
 
